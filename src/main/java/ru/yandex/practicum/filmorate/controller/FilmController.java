@@ -15,6 +15,7 @@ import java.util.Set;
 @Slf4j
 public class FilmController {
     private final Map<Integer, Film> films = new HashMap<>();
+    private int lastId = 1;
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
 
@@ -25,11 +26,13 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
-//        if (films.containsKey(film.getId())) {
-//            String filmAlreadyExists = "Фильм с таким id уже существует";
-//            log.error(filmAlreadyExists);
-//            throw new ValidationException(filmAlreadyExists);
-//        }
+        if (films.containsKey(film.getId())) {
+            String filmAlreadyExists = "Фильм с таким id уже существует";
+            log.error(filmAlreadyExists);
+            throw new ValidationException(filmAlreadyExists);
+        }
+
+        film.setId(lastId++);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         for (ConstraintViolation<Film> violation : violations) {
@@ -44,7 +47,9 @@ public class FilmController {
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
         if (!films.containsKey(film.getId())) {
-            log.error("Фильма с таким id не существует");
+            String filmDoesNotExist = "Фильма с таким id не существует";
+            log.error(filmDoesNotExist);
+            throw new ValidationException(filmDoesNotExist);
         }
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         for (ConstraintViolation<Film> violation : violations) {

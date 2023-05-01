@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -15,6 +17,7 @@ import java.util.Set;
 @Slf4j
 public class UserController {
     private final Map<Integer, User> users = new HashMap<>();
+    private int lastId = 1;
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
 
@@ -36,9 +39,11 @@ public class UserController {
             throw new ValidationException(userAlreadyExists);
         }
 
-        if (user.getName().isEmpty() || user.getName().isBlank()) {
+        if (user.getName() == null || user.getName().isEmpty() || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
+
+        user.setId(lastId++);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         for (ConstraintViolation<User> violation : violations) {
@@ -52,12 +57,7 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@RequestBody User user) {
-        if (!users.containsKey(user.getEmail())) {
-            String userDoesNotExist = "Пользователь с такой почтой не существует";
-            log.error(userDoesNotExist);
-            throw new ValidationException(userDoesNotExist);
-        }
-        if (users.containsKey(user.getId())) {
+        if (!users.containsKey(user.getId())) {
             String userDoesNotExist = "Пользователь с таким id не существует";
             log.error(userDoesNotExist);
             throw new ValidationException(userDoesNotExist);
