@@ -22,7 +22,7 @@ class FilmControllerTests {
         filmController = new FilmController();
         film = new Film();
     }
-    
+
     @Test
     void shouldNotBeValidWhenEmptyName() {
         film.setId(0);
