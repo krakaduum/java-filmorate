@@ -32,13 +32,13 @@ public class FilmController {
             throw new ValidationException(filmAlreadyExists);
         }
 
-        film.setId(lastId++);
-
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         for (ConstraintViolation<Film> violation : violations) {
             log.error(violation.getMessage());
             throw new ValidationException("Валидация не пройдена");
         }
+
+        film.setId(lastId++);
 
         films.put(film.getId(), film);
         return film;

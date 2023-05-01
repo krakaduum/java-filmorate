@@ -41,13 +41,13 @@ public class UserController {
             user.setName(user.getLogin());
         }
 
-        user.setId(lastId++);
-
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         for (ConstraintViolation<User> violation : violations) {
             log.error(violation.getMessage());
             throw new ValidationException("Валидация не пройдена");
         }
+
+        user.setId(lastId++);
 
         users.put(user.getId(), user);
         return user;
