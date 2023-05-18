@@ -1,37 +1,38 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.*;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 @RestController
 @RequestMapping("/films")
 @Slf4j
+@Component
 public class FilmController {
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final FilmService filmService;
     private int lastId = 1;
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
 
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
+
     @GetMapping
     public Collection<Film> getFilms() {
-        return films.values();
+        return filmService.getFilms();
     }
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
-        if (films.containsKey(film.getId())) {
-            String filmAlreadyExists = "Фильм с таким id уже существует";
-            log.error(filmAlreadyExists);
-            throw new ValidationException(filmAlreadyExists);
-        }
-
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         for (ConstraintViolation<Film> violation : violations) {
             log.error(violation.getMessage());
@@ -40,23 +41,39 @@ public class FilmController {
 
         film.setId(lastId++);
 
-        films.put(film.getId(), film);
+        filmService.addFilm(film);
         return film;
     }
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        if (!films.containsKey(film.getId())) {
-            String filmDoesNotExist = "Фильма с таким id не существует";
-            log.error(filmDoesNotExist);
-            throw new ValidationException(filmDoesNotExist);
-        }
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         for (ConstraintViolation<Film> violation : violations) {
             log.error(violation.getMessage());
             throw new ValidationException("Валидация не пройдена");
         }
-        films.put(film.getId(), film);
+
+        filmService.updateFilm(film);
         return film;
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable int id) {
+        return filmService.getFilm(id);
+    }
+
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable int id, @PathVariable int userId) {
+        filmService.addLike(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLike(@PathVariable int id, @PathVariable int userId) {
+        filmService.removeLike(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public Collection<Film> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
+        return filmService.getTopFilms(count);
     }
 }
