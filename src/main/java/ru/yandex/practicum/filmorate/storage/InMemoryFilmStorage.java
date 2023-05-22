@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -11,15 +10,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
-@Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
     Map<Integer, Film> films = new HashMap<>();
 
     @Override
     public void addFilm(Film film) {
         if (films.containsKey(film.getId())) {
-            String filmAlreadyExists = "Фильм с таким id уже существует";
-            log.error(filmAlreadyExists);
+            String filmAlreadyExists = "Фильм с id = " + film.getId() + " уже существует";
             throw new RuntimeException(filmAlreadyExists);
         }
 
@@ -29,8 +26,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void updateFilm(Film film) {
         if (!films.containsKey(film.getId())) {
-            String filmDoesNotExist = "Фильма с таким id не существует";
-            log.error(filmDoesNotExist);
+            String filmDoesNotExist = "Фильма с id = " + film.getId() + " не существует";
             throw new NoSuchElementException(filmDoesNotExist);
         }
 
@@ -40,8 +36,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void deleteFilm(int id) {
         if (!films.containsKey(id)) {
-            String filmDoesNotExist = "Фильма с таким id не существует";
-            log.error(filmDoesNotExist);
+            String filmDoesNotExist = "Фильма с id = " + id + " не существует";
             throw new NoSuchElementException(filmDoesNotExist);
         }
 
@@ -51,8 +46,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film getFilm(int id) {
         if (!films.containsKey(id)) {
-            String filmDoesNotExist = "Фильма с таким id не существует";
-            log.error(filmDoesNotExist);
+            String filmDoesNotExist = "Фильма с id = " + id + " не существует";
             throw new NoSuchElementException(filmDoesNotExist);
         }
 

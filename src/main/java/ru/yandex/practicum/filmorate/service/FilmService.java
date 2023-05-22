@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
-    
+
     @Autowired
     public FilmService(FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
@@ -20,7 +20,7 @@ public class FilmService {
     public void addLike(int filmId, int userId) {
         Film film = filmStorage.getFilm(filmId);
         if (film == null) {
-            throw new NoSuchElementException("Фильм не найден");
+            throw new NoSuchElementException("Фильм с id = " + filmId + " не найден");
         }
         film.addLike(userId);
     }
@@ -28,11 +28,11 @@ public class FilmService {
     public void removeLike(int filmId, int userId) {
         Film film = filmStorage.getFilm(filmId);
         if (film == null) {
-            throw new NoSuchElementException("Фильм не найден");
+            throw new NoSuchElementException("Фильм с id = " + filmId + " не найден");
         }
 
         if (!film.getLikes().contains(userId)) {
-            throw new NoSuchElementException("Лайк не найден");
+            throw new NoSuchElementException("Лайк пользователя " + userId + " не найден");
         }
 
         film.removeLike(userId);
