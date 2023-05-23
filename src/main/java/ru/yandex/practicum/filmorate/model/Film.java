@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.yandex.practicum.filmorate.validator.IsAfter;
 
@@ -9,22 +11,37 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Film {
-    private int id;
+    int id;
 
     @NotNull
     @NotBlank
-    private String name;
+    String name;
 
     @Size(max = 200)
-    private String description;
+    String description;
 
     @IsAfter(current = "1895-12-27", message = "Дата должна быть больше 1895-12-27")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate releaseDate;
+    LocalDate releaseDate;
 
     @Positive
-    private int duration;
+    int duration;
+
+    Set<Integer> likes = new HashSet<>();
+
+    public void addLike(int userId) {
+        likes.add(userId);
+    }
+
+    public void removeLike(int userId) {
+        if (likes.contains(userId)) {
+            likes.remove(userId);
+        }
+    }
 }
