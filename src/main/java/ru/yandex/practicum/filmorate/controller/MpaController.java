@@ -23,6 +23,7 @@ public class MpaController {
     public MpaController(MpaService mpaService) {
         this.mpaService = mpaService;
     }
+
     @GetMapping("/{id}")
     public Mpa getMpa(@PathVariable int id) {
         return mpaService.getMpa(id);
