@@ -137,8 +137,7 @@ public class UserDbStorage implements UserStorage {
 
         try {
             jdbcTemplate.update(sqlQuery, id, friendId);
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             throw new NoSuchElementException("Пользователи не найдены");
         }
     }
