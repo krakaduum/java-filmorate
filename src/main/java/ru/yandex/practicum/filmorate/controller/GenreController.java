@@ -23,6 +23,7 @@ public class GenreController {
     public GenreController(GenreService genreService) {
         this.genreService = genreService;
     }
+    
     @GetMapping("/{id}")
     public Genre getGenre(@PathVariable int id) {
         return genreService.getGenre(id);
