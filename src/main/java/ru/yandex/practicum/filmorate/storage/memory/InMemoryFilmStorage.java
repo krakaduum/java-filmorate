@@ -1,15 +1,14 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.memory;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+@Qualifier("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     Map<Integer, Film> films = new HashMap<>();
 
@@ -56,5 +55,33 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Set<Film> getFilms() {
         return films.values().stream().collect(Collectors.toSet());
+    }
+
+    public void addLike(int filmId, int userId) {
+        Film film = getFilm(filmId);
+        if (film == null) {
+            throw new NoSuchElementException("Фильм с id = " + filmId + " не найден");
+        }
+        film.addLike(userId);
+    }
+
+    public void removeLike(int filmId, int userId) {
+        Film film = getFilm(filmId);
+        if (film == null) {
+            throw new NoSuchElementException("Фильм с id = " + filmId + " не найден");
+        }
+
+        if (!film.getLikes().contains(userId)) {
+            throw new NoSuchElementException("Лайк пользователя " + userId + " не найден");
+        }
+
+        film.removeLike(userId);
+    }
+
+    public Set<Film> getTopFilms(int count) {
+        return getFilms().stream()
+                .sorted(Comparator.comparingInt(x -> -x.getLikes().size()))
+                .limit(count)
+                .collect(Collectors.toSet());
     }
 }

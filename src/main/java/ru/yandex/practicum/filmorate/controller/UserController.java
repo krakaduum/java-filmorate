@@ -39,8 +39,6 @@ public class UserController {
             throw new ValidationException("Валидация не пройдена");
         }
 
-        user.setId(lastId++);
-
         userService.addUser(user);
         return user;
     }

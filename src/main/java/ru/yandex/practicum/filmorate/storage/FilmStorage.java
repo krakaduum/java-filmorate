@@ -15,4 +15,10 @@ public interface FilmStorage {
     public Film getFilm(int id);
 
     public Set<Film> getFilms();
+
+    public void addLike(int filmId, int userId);
+
+    public void removeLike(int filmId, int userId);
+
+    public Set<Film> getTopFilms(int count);
 }

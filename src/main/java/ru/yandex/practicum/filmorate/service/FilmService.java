@@ -1,15 +1,17 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Collection;
+import java.util.Set;
 
 @Service
 public class FilmService {
+    @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
 
     @Autowired
@@ -18,31 +20,15 @@ public class FilmService {
     }
 
     public void addLike(int filmId, int userId) {
-        Film film = filmStorage.getFilm(filmId);
-        if (film == null) {
-            throw new NoSuchElementException("Фильм с id = " + filmId + " не найден");
-        }
-        film.addLike(userId);
+        filmStorage.addLike(filmId, userId);
     }
 
     public void removeLike(int filmId, int userId) {
-        Film film = filmStorage.getFilm(filmId);
-        if (film == null) {
-            throw new NoSuchElementException("Фильм с id = " + filmId + " не найден");
-        }
-
-        if (!film.getLikes().contains(userId)) {
-            throw new NoSuchElementException("Лайк пользователя " + userId + " не найден");
-        }
-
-        film.removeLike(userId);
+        filmStorage.removeLike(filmId, userId);
     }
 
     public Set<Film> getTopFilms(int count) {
-        return filmStorage.getFilms().stream()
-                .sorted(Comparator.comparingInt(x -> -x.getLikes().size()))
-                .limit(count)
-                .collect(Collectors.toSet());
+        return filmStorage.getTopFilms(count);
     }
 
     public Film getFilm(int id) {
