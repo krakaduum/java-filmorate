@@ -45,6 +45,8 @@ public class FilmDbStorage implements FilmStorage {
             return stmt;
         }, keyHolder);
 
+        updateGenresInFilm(film);
+
         long idKey = keyHolder.getKey().longValue();
         film.setId((int) idKey);
     }
