@@ -17,7 +17,6 @@ import java.util.Set;
 @Component
 public class UserController {
     private final UserService userService;
-    private int lastId = 1;
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
 
