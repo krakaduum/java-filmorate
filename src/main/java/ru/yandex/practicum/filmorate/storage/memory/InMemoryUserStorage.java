@@ -1,19 +1,58 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.storage.memory;
 
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Qualifier;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
-@Component
+@Qualifier("inMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
     Map<Integer, User> users = new HashMap<>();
 
+    public void addFriend(int id, int friendId) {
+        User user = getUser(id);
+        User friend = getUser(friendId);
+        if (user == null || friend == null) {
+            throw new NoSuchElementException("Пользователь не найден");
+        }
+        user.addFriend(friend);
+    }
+
+    public void removeFriend(int id, int friendId) {
+        User user = getUser(id);
+        User friend = getUser(friendId);
+        if (user == null || friend == null) {
+            throw new NoSuchElementException("Пользователь не найден");
+        }
+        user.removeFriend(friend);
+    }
+
+    public Collection<User> getUserFriends(int id) {
+        User user = getUser(id);
+        if (user == null) {
+            throw new NoSuchElementException("Пользователь не найден");
+        }
+        return user.getFriends().values();
+    }
+
+    public Collection<User> getMutualFriends(int id, int otherId) {
+        User user = getUser(id);
+        User other = getUser(otherId);
+        if (user == null || other == null) {
+            throw new NoSuchElementException("Пользователь не найден");
+        }
+        List<User> mutualFriends = new ArrayList<>();
+        for (User friend : user.getFriends().values()) {
+            if (other.getFriends().containsKey(friend.getId())) {
+                mutualFriends.add(friend);
+            }
+        }
+        return mutualFriends;
+    }
+
     @Override
-    public void addUser(User user) {
+    public User addUser(User user) {
         if (users.containsKey(user.getEmail())) {
             throw new RuntimeException("Пользователь с почтой " + user.getEmail() + " уже существует");
         }
@@ -26,6 +65,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
 
         users.put(user.getId(), user);
+        return user;
     }
 
     @Override

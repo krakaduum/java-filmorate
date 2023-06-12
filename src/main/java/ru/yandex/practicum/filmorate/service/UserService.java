@@ -1,17 +1,18 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.NoSuchElementException;
 
 @Service
+@Slf4j
 public class UserService {
+    @Qualifier("userDbStorage")
     private final UserStorage userStorage;
 
     @Autowired
@@ -20,44 +21,23 @@ public class UserService {
     }
 
     public void addFriend(int id, int friendId) {
-        User user = userStorage.getUser(id);
-        User friend = userStorage.getUser(friendId);
-        if (user == null || friend == null) {
-            throw new NoSuchElementException("Пользователь не найден");
-        }
-        user.addFriend(friend);
+        userStorage.addFriend(id, friendId);
+
+        log.info("Пользователь " + id + " добавил в друзья пользователя " + friendId);
     }
 
     public void removeFriend(int id, int friendId) {
-        User user = userStorage.getUser(id);
-        User friend = userStorage.getUser(friendId);
-        if (user == null || friend == null) {
-            throw new NoSuchElementException("Пользователь не найден");
-        }
-        user.removeFriend(friend);
+        userStorage.removeFriend(id, friendId);
+
+        log.info("Пользователь " + id + " удалил из друзей пользователя " + friendId);
     }
 
     public Collection<User> getUserFriends(int id) {
-        User user = userStorage.getUser(id);
-        if (user == null) {
-            throw new NoSuchElementException("Пользователь не найден");
-        }
-        return user.getFriends().values();
+        return userStorage.getUserFriends(id);
     }
 
     public Collection<User> getMutualFriends(int id, int otherId) {
-        User user = userStorage.getUser(id);
-        User other = userStorage.getUser(otherId);
-        if (user == null || other == null) {
-            throw new NoSuchElementException("Пользователь не найден");
-        }
-        List<User> mutualFriends = new ArrayList<>();
-        for (User friend : user.getFriends().values()) {
-            if (other.getFriends().containsKey(friend.getId())) {
-                mutualFriends.add(friend);
-            }
-        }
-        return mutualFriends;
+        return userStorage.getMutualFriends(id, otherId);
     }
 
     public Collection<User> getUsers() {
@@ -70,9 +50,13 @@ public class UserService {
 
     public void addUser(User user) {
         userStorage.addUser(user);
+
+        log.info("Добавлен пользователь с идентификатором " + user.getId());
     }
 
     public void updateUser(User user) {
         userStorage.updateUser(user);
+
+        log.info("Обновлен пользователь с идентификатором " + user.getId());
     }
 }
