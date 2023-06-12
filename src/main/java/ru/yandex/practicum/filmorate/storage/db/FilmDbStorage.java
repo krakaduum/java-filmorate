@@ -136,7 +136,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private void updateGenresNamesForFilm(Film film) {
         var genres = genreDbStorage.getAllGenres();
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+        if (film.getGenres() != null) {
             film.getGenres().forEach(x -> x.setName(
                     genres.stream().filter(g -> x.getId() == g.getId()).findFirst().orElse(null)
                             .getName()));
@@ -144,7 +144,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void updateGenresInFilm(Film film) {
-        if (film.getGenres() == null || film.getGenres().isEmpty()) {
+        if (film.getGenres() == null) {
             return;
         }
 
